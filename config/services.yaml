@@ -28,3 +28,7 @@ services:
             $collectors: !tagged customerOrder.collector
     
     App\Service\CustomerOrderCollectorInterface: ~
+    
+    App\EventSubscriber\ResponseHeadersSubscriber:
+        tags:
+            - { name: kernel.event_subscriber }
