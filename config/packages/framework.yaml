@@ -8,6 +8,10 @@ framework:
 
     #esi: true
     #fragments: true
+    
+    http_method_override: true
+    response_headers:
+        x-task: 1
 
 when@test:
     framework:
