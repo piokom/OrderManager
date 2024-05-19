@@ -6,6 +6,7 @@ use App\Entity\CustomerOrder;
 use App\Entity\OrderItem;
 use App\Repository\CustomerOrderRepository;
 use App\Repository\ProductRepository;
+use App\Service\CustomerOrderCalculator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -26,9 +27,6 @@ class CustomerOrderController extends AbstractController
         $customerOrder = new CustomerOrder();
         $customerOrder->setCreatedAt(new \DateTime());
         
-        $totalPrice = 0;
-        $totalVat = 0;
-        
         foreach ($data['items'] as $item) {
             $product = $productRepository->find($item['productId']);
             
@@ -43,14 +41,26 @@ class CustomerOrderController extends AbstractController
             $orderItem->setPrice($product->getPrice());
             $orderItem->setVat($product->getPrice() * $product->getVatRate() / 100);
             
-            $totalPrice += $orderItem->getPrice() * $orderItem->getQuantity();
-            $totalVat += $orderItem->getVat() * $orderItem->getQuantity();
-            
             $entityManager->persist($orderItem);
         }
         
-        $customerOrder->setTotalPrice($totalPrice);
-        $customerOrder->setTotalVat($totalVat);
+        $calculator = new CustomerOrderCalculator();
+        $calculation = $calculator->calculatePrice(
+            array_map(function ($item) use ($productRepository) {
+                $product = $productRepository->find($item['productId']);
+                
+                return [
+                    'price' => $product->getPrice(),
+                    'vatRate' => $product->getVatRate(),
+                    'quantity' => $item['quantity'],
+                ];
+            },
+            $data['items']
+            )
+        );
+        
+        $customerOrder->setTotalPrice($calculation['totalPrice']);
+        $customerOrder->setTotalVat($calculation['totalVat']);
         
         $entityManager->persist($customerOrder);
         $entityManager->flush();
