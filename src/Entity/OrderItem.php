@@ -16,9 +16,9 @@ class OrderItem
     #[ORM\Column(type: Types::INTEGER)]
     private int $id;
 
-    #[ORM\ManyToOne(targetEntity: CustomerOrder::class)]
+    #[ORM\ManyToOne(targetEntity: CustomerOrder::class, inversedBy: 'orderItems')]
     #[ORM\JoinColumn(nullable: false)]
-    private CustomerOrder $customerOrder;
+    private ?CustomerOrder $customerOrder = null;
 
     #[ORM\ManyToOne(targetEntity: Product::class)]
     #[ORM\JoinColumn(nullable: false)]
@@ -38,12 +38,12 @@ class OrderItem
         return $this->id;
     }
 
-    public function getCustomerOrder(): CustomerOrder
+    public function getCustomerOrder(): ?CustomerOrder
     {
         return $this->customerOrder;
     }
 
-    public function setCustomerOrder(CustomerOrder $customerOrder): static
+    public function setCustomerOrder(?CustomerOrder $customerOrder): self
     {
         $this->customerOrder = $customerOrder;
 
@@ -55,7 +55,7 @@ class OrderItem
         return $this->product;
     }
 
-    public function setProduct(Product $product): static
+    public function setProduct(Product $product): self
     {
         $this->product = $product;
 
@@ -67,7 +67,7 @@ class OrderItem
         return $this->quantity;
     }
 
-    public function setQuantity(int $quantity): static
+    public function setQuantity(int $quantity): self
     {
         $this->quantity = $quantity;
 
@@ -79,7 +79,7 @@ class OrderItem
         return $this->price;
     }
 
-    public function setPrice(string $price): static
+    public function setPrice(string $price): self
     {
         $this->price = $price;
 
@@ -91,7 +91,7 @@ class OrderItem
         return $this->vat;
     }
 
-    public function setVat(string $vat): static
+    public function setVat(string $vat): self
     {
         $this->vat = $vat;
 

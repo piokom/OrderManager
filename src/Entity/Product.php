@@ -35,7 +35,7 @@ class Product
         return $this->name;
     }
 
-    public function setName(string $name): static
+    public function setName(string $name): self
     {
         $this->name = $name;
 
@@ -47,7 +47,7 @@ class Product
         return $this->price;
     }
 
-    public function setPrice(string $price): static
+    public function setPrice(string $price): self
     {
         $this->price = $price;
 
@@ -59,7 +59,7 @@ class Product
         return $this->vatRate;
     }
 
-    public function setVatRate(int $vatRate): static
+    public function setVatRate(int $vatRate): self
     {
         $this->vatRate = $vatRate;
 

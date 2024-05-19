@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\CustomerOrderRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -24,6 +26,14 @@ class CustomerOrder
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private string $totalVat;
+    
+    #[ORM\OneToMany(mappedBy: 'customerOrder', targetEntity: OrderItem::class)]
+    private Collection $orderItems;
+
+    public function __construct()
+    {
+        $this->orderItems = new ArrayCollection();
+    }
 
     public function getId(): int
     {
@@ -35,7 +45,7 @@ class CustomerOrder
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): static
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
 
@@ -47,7 +57,7 @@ class CustomerOrder
         return $this->totalPrice;
     }
 
-    public function setTotalPrice(string $totalPrice): static
+    public function setTotalPrice(string $totalPrice): self
     {
         $this->totalPrice = $totalPrice;
 
@@ -59,10 +69,15 @@ class CustomerOrder
         return $this->totalVat;
     }
 
-    public function setTotalVat(string $totalVat): static
+    public function setTotalVat(string $totalVat): self
     {
         $this->totalVat = $totalVat;
 
         return $this;
+    }
+
+    public function getOrderItems(): Collection
+    {
+        return $this->orderItems;
     }
 }

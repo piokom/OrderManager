@@ -2,22 +2,21 @@
 
 namespace App\Service;
 
+use App\Entity\CustomerOrder;
+
 class CustomerOrderCalculator
 {
-    public function calculatePrice(array $items): array
+    private array $collectors;
+    
+    public function __construct(iterable $collectors)
     {
-        $totalPrice = 0;
-        $totalVat = 0;
-        
-        foreach ($items as $item) {
-            $totalPrice += $item['price'] * $item['quantity'];
-            $totalVat += $item['price'] * $item['vatRate'] / 100 * $item['quantity'];
+        $this->collectors = $collectors;
+    }
+
+    public function calculate(CustomerOrder $customerOrder): void
+    {
+        foreach ($this->collectors as $collector) {
+            $collector->collect($customerOrder);
         }
-        
-        return [
-          'totalPrice' => $totalPrice,
-          'totalVat' => $totalVat,
-          'total' => $totalPrice + $totalVat,  
-        ];
     }
 }

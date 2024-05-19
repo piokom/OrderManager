@@ -15,6 +15,13 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class CustomerOrderController extends AbstractController
 {
+    private CustomerOrderCalculator $customerOrderCalculator;
+
+    public function __construct(CustomerOrderCalculator $customerOrderCalculator)
+    {
+        $this->customerOrderCalculator = $customerOrderCalculator;
+    }
+
     #[Route('/customer_order', name: 'create_customer_order', methods: ['POST'])]
     public function createCustomerOrder(Request $request, ProductRepository $productRepository, EntityManagerInterface $entityManager): JsonResponse
     {
@@ -44,23 +51,8 @@ class CustomerOrderController extends AbstractController
             $entityManager->persist($orderItem);
         }
         
-        $calculator = new CustomerOrderCalculator();
-        $calculation = $calculator->calculatePrice(
-            array_map(function ($item) use ($productRepository) {
-                $product = $productRepository->find($item['productId']);
-                
-                return [
-                    'price' => $product->getPrice(),
-                    'vatRate' => $product->getVatRate(),
-                    'quantity' => $item['quantity'],
-                ];
-            },
-            $data['items']
-            )
-        );
-        
-        $customerOrder->setTotalPrice($calculation['totalPrice']);
-        $customerOrder->setTotalVat($calculation['totalVat']);
+        // calculate total price & vat
+        $this->customerOrderCalculator->calculate($customerOrder);
         
         $entityManager->persist($customerOrder);
         $entityManager->flush();
