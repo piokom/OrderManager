@@ -1,1 +1,1 @@
-Run docker-compose up -d to run container with database.
+Run `docker-compose up -d` to run container with database.
