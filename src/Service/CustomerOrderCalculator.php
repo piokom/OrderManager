@@ -6,7 +6,7 @@ use App\Entity\CustomerOrder;
 
 class CustomerOrderCalculator
 {
-    private array $collectors;
+    private iterable $collectors;
     
     public function __construct(iterable $collectors)
     {
