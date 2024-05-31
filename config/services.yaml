@@ -32,3 +32,8 @@ services:
     App\EventSubscriber\ResponseHeadersSubscriber:
         tags:
             - { name: kernel.event_subscriber }
+              
+    App\Service\Integration\ApiClient:
+        arguments:
+            $httpClient: '@http_client'
+            $apiUrl: '%env(EXTERNAL_API_URL)%'

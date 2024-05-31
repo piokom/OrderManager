@@ -7,6 +7,7 @@ use App\Entity\OrderItem;
 use App\Repository\CustomerOrderRepository;
 use App\Repository\ProductRepository;
 use App\Service\CustomerOrderCalculator;
+use App\Service\Integration\ApiClient;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,10 +16,12 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class CustomerOrderController extends AbstractController
 {
+    private ApiClient $apiClient;
     private CustomerOrderCalculator $customerOrderCalculator;
 
-    public function __construct(CustomerOrderCalculator $customerOrderCalculator)
+    public function __construct(ApiClient $apiClient, CustomerOrderCalculator $customerOrderCalculator)
     {
+        $this->apiClient = $apiClient;
         $this->customerOrderCalculator = $customerOrderCalculator;
     }
 
@@ -56,6 +59,11 @@ class CustomerOrderController extends AbstractController
         
         $entityManager->persist($customerOrder);
         $entityManager->flush();
+        
+        $statusOK = $this->apiClient->sendCustomerOrder($customerOrder);
+        if (!$statusOK) {
+            return $this->json(['error' => 'Failed to send order'], 400);
+        }
         
         return $this->json($customerOrder);        
     }
